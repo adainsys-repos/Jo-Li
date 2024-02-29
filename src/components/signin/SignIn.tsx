@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { useStore, storeTypes } from "../../../context/store";
 import { Lock, Mail } from "lucide-react";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().min(2).max(50),

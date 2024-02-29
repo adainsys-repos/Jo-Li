@@ -1,27 +1,30 @@
-import { Edit, Plus } from "lucide-react";
+// import { Edit, Plus } from "lucide-react";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import ChangeUserPswd from "./components/ChangeUserPswd";
+import CreateUser from "./components/CreateUser";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "./components/ui/input";
-import { Button } from "./components/ui/button";
+// import {
+//   Sheet,
+//   SheetContent,
+//   SheetHeader,
+//   SheetTitle,
+//   SheetTrigger,
+// } from "@/components/ui/sheet";
+
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import { Input } from "./components/ui/input";
+// import { Button } from "./components/ui/button";
 
 export default function App() {
   return (
     <div className="w-10/12 h-full m-auto flex flex-col py-10 ">
-      <div className="w-full flex flex-col gap-4">
+      {/* <div className="w-full flex flex-col gap-4">
         {[
           { name: "frontend", id: 1020 },
           { name: "backend", id: 1021 },
@@ -77,6 +80,10 @@ export default function App() {
             </div>
           </div>
         ))}
+      </div> */}
+      <div className="flex flex-col w-1/3 gap-4">
+        <ChangeUserPswd />
+        <CreateUser />
       </div>
     </div>
   );

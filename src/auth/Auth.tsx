@@ -6,7 +6,9 @@ export default function Auth() {
   const { authToken } = useStore() as storeTypes;
   useEffect(() => {}, [authToken]);
   return document.cookie.includes("token") ? (
-    <>{<Outlet />}</>
+    <>
+      <Outlet />
+    </>
   ) : (
     <Navigate to="/signin" />
   );
