@@ -9,27 +9,24 @@ import {
 } from "@/components/ui/accordion";
 import { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosInstance";
+import AddJob from "./components/AddJob";
 
 export default function App() {
   const [jobs, setJobs] = useState([]);
+  const [sources, setSources] = useState([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
-      const data = await axiosInstance.get("/jobs/all-jobIds", {
-        headers: {
-          Authorization: `Bearer ${
-            document.cookie
-              .split(";")
-              .find((c) => c.trim().startsWith(`token=`))
-              ?.split("=")[1] || null
-          } `,
-        },
-      });
-
+      const data = await axiosInstance.get("/jobs/all-jobIds");
       setJobs(data.data);
+    };
+    const fetchJobSources = async () => {
+      const data = await axiosInstance.get("/jobs/job-sources");
+      setSources(data.data);
     };
 
     fetchJobs();
+    fetchJobSources();
   }, []);
 
   console.log(jobs);
@@ -38,7 +35,7 @@ export default function App() {
     <div className="w-10/12 h-full m-auto flex flex-col py-10 ">
       <div className="flex justify-between items-center">
         <h4 className="text-white/90 text-2xl font-medium">Main Dashboard</h4>
-        <Button className="bg-blue-500 px-8">Add</Button>
+        <AddJob />
       </div>
       <div className="text-white/90 py-10">
         <Accordion type="single" className="space-y-4" collapsible>
