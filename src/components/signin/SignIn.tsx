@@ -22,7 +22,11 @@ export default function SignIn() {
     },
   });
 
-  const { authToken, setAuthToken } = useStore() as storeTypes;
+  const { setAuthToken } = useStore() as storeTypes;
+
+  if (document.cookie.includes("token")) {
+    return window.open("/", "_self");
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -43,14 +47,12 @@ export default function SignIn() {
       console.log(e);
     }
   }
-  console.log(authToken);
   return (
     <div className="flex flex-col m-auto items-center justify-center max-w-6xl h-screen">
       <div className="bg-[#1C1C1C] h-1/2 w-1/3 border border-slate-950 rounded-xl px-2.5 py-4 ">
         <h3 className="text-center text-2xl font-medium text-white/90 py-3">
-          JoLi{" "}
+          JoLi
         </h3>
-
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -66,7 +68,8 @@ export default function SignIn() {
                       <Mail className=" h-4  text-white/50" strokeWidth={1.5} />
 
                       <Input
-                        className="text-white/50 bg-transparent relative border-none focus-visible:ring-none px-0 "
+                        autoComplete="off"
+                        className="text-white/50 bg-transparent focus-visible:bg-none relative border-none focus-visible:ring-none px-0 "
                         placeholder="email address"
                         {...field}
                       />

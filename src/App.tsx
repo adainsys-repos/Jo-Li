@@ -10,23 +10,27 @@ import {
 import { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosInstance";
 import AddJob from "./components/AddJob";
+import { Skeleton } from "./components/ui/skeleton";
 
 export default function App() {
   const [jobs, setJobs] = useState([]);
   const [sources, setSources] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchJobs = async () => {
-      const data = await axiosInstance.get("/jobs/all-jobIds");
-      setJobs(data.data);
-    };
-    const fetchJobSources = async () => {
-      const data = await axiosInstance.get("/jobs/job-sources");
-      setSources(data.data);
+    const fetchData = async () => {
+      try {
+        const jobData = await axiosInstance.get("/jobs/all-jobIds");
+        const sourceData = await axiosInstance.get("/jobs/job-sources");
+        setJobs(jobData.data);
+        setSources(sourceData.data);
+        setLoading(false);
+      } catch (e) {
+        console.log(e);
+      }
     };
 
-    fetchJobs();
-    fetchJobSources();
+    fetchData();
   }, []);
 
   console.log(jobs);
@@ -39,26 +43,40 @@ export default function App() {
       </div>
       <div className="text-white/90 py-10">
         <Accordion type="single" className="space-y-4" collapsible>
-          {jobs &&
-            jobs.map((e) => (
-              <AccordionItem
-                value={e}
-                className="border border-[#1C1C1C] px-8 rounded-lg"
-              >
-                <AccordionTrigger className="flex w-full justify-end gap-8 hover:no-underline">
-                  <div className="flex w-full gap-20">
-                    <p>{e.JobSource.name}</p>
-                    <p>{e.jobId}</p>
-                  </div>
-                  <Button className="bg-[#1C1C1C] hover:bg-[#1C1C1C]/60 px-8">
-                    View
-                  </Button>
-                </AccordionTrigger>
-                <AccordionContent>
-                  Yes. It adheres to the WAI-ARIA design pattern.
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+          {loading ? (
+            <>
+              <div className="space-y-6">
+                <Skeleton className="w-full h-14 bg-[#1C1C1C]" />
+                <Skeleton className="w-full h-14 bg-[#1C1C1C]" />
+                <Skeleton className="w-full h-14 bg-[#1C1C1C]" />
+              </div>
+            </>
+          ) : (
+            <>
+              {jobs &&
+                jobs.map((e) => (
+                  <>
+                    <AccordionItem
+                      value={e}
+                      className="border border-[#1C1C1C] px-8 rounded-lg"
+                    >
+                      <AccordionTrigger className="flex w-full justify-end gap-8 hover:no-underline">
+                        <div className="flex w-full gap-20">
+                          <p>{e.JobSource.name}</p>
+                          <p>{e.jobId}</p>
+                        </div>
+                        <Button className="bg-[#222222] hover:bg-[#222222]/60 px-8">
+                          View
+                        </Button>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        Yes. It adheres to the WAI-ARIA design pattern.
+                      </AccordionContent>
+                    </AccordionItem>
+                  </>
+                ))}
+            </>
+          )}
         </Accordion>
       </div>
     </div>

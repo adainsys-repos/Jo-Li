@@ -58,6 +58,7 @@ export default function AddJob() {
                       key={e.id}
                       value={e.name}
                       onMouseDown={() => setSelectedSource(e.id)}
+                      className="focus:bg-[#242424] focus:text-white/80"
                     >
                       {e.name}
                     </SelectItem>
