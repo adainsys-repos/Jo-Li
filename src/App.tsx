@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosInstance";
 import AddJob from "./components/AddJob";
 import { Skeleton } from "./components/ui/skeleton";
+import ManageUsers from "./components/ManageUsers";
 
 export default function App() {
   const [jobs, setJobs] = useState([]);
@@ -58,19 +59,20 @@ export default function App() {
                   <>
                     <AccordionItem
                       value={e}
-                      className="border border-[#1C1C1C] px-8 rounded-lg"
+                      className="border border-[#1C1C1C] flex flex-col px-8 rounded-lg"
                     >
-                      <AccordionTrigger className="flex w-full justify-end gap-8 hover:no-underline">
+                      <div className="flex w-full gap-4 items-center py-3">
                         <div className="flex w-full gap-20">
                           <p>{e.JobSource.name}</p>
                           <p>{e.jobId}</p>
                         </div>
-                        <Button className="bg-[#222222] hover:bg-[#222222]/60 px-8">
-                          View
-                        </Button>
-                      </AccordionTrigger>
+                        <ManageUsers userId={"ef"} email={"id"} />
+                        <AccordionTrigger className="flex w-full justify-end gap-8 hover:no-underline"></AccordionTrigger>
+                      </div>
                       <AccordionContent>
-                        Yes. It adheres to the WAI-ARIA design pattern.
+                        {e.Users.map((user) => (
+                          <p>{user.email}</p>
+                        ))}
                       </AccordionContent>
                     </AccordionItem>
                   </>
