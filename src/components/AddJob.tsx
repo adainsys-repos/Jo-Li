@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 import {
   Dialog,
   DialogClose,
@@ -53,7 +53,7 @@ export default function AddJob() {
                   <SelectValue placeholder="Select a source" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1d1d1d] text-white/80 ">
-                  {sources.map((e: any) => (
+                  {sources.map((e: unknown) => (
                     <SelectItem
                       key={e.id}
                       value={e.name}

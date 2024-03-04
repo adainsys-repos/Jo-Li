@@ -4,9 +4,10 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useStore, storeTypes } from "../../../context/store";
 import { Lock, Mail } from "lucide-react";
-import axios from "axios";
+import axiosInstance from "../../../config/axiosInstance";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().min(2).max(50),
@@ -22,26 +23,21 @@ export default function SignIn() {
     },
   });
 
-  const { setAuthToken } = useStore() as storeTypes;
+  const navigate = useNavigate();
 
-  if (document.cookie.includes("token")) {
-    return window.open("/", "_self");
-  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     try {
-      await axios
-        .post("https://joli.onrender.com/api/auth/sign-in", {
+      await axiosInstance
+        .post("/auth/sign-in", {
           email: values.email,
           password: values.password,
         })
         .then((res) => {
-          const expirationDate = new Date(Date.now() + 25892000000);
-          document.cookie = `token=${
-            res.data.token
-          };expires=${expirationDate.toUTCString()};path=/`;
-          setAuthToken(res.data.token);
+          Cookies.set("A_AccessToken", res.data.tokens.accessToken);
+          Cookies.set("A_RefreshToken", res.data.tokens.refreshToken, { expires: 3 });
+          navigate("/");
         });
     } catch (e) {
       console.log(e);

@@ -1,6 +1,6 @@
-//@ts-nocheck
-import { Button } from "./components/ui/button";
 
+import { Button } from "./components/ui/button";
+import { useRef } from "react"
 import {
   Accordion,
   AccordionContent,
@@ -11,11 +11,45 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosInstance";
 import AddJob from "./components/AddJob";
 import { Skeleton } from "./components/ui/skeleton";
+import Cookies from "js-cookie";
 
 export default function App() {
   const [jobs, setJobs] = useState([]);
+
   const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isRefreshing = useRef<boolean>(false)
+
+
+  useEffect(() => {
+    const requestInterceptors = axiosInstance.interceptors.request.use((config) => {
+      const token = Cookies.get("A_AccessToken")
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      return config
+    })
+    const refreshTokenInterceptor = axiosInstance.interceptors.response.use((res) => {
+      return res
+    }, async (error) => {
+      if (error.response.status === 401 && !isRefreshing.current) {
+        isRefreshing.current = true
+        console.log("refreshing token")
+        const res = await axiosInstance.post("/auth/refresh-token", {
+          refreshToken: Cookies.get("A_RefreshToken")
+        })
+        Cookies.set("A_AccessToken", res.data.token);
+        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+        return axiosInstance(error.config)
+      }
+      isRefreshing.current = false
+      return Promise.reject(error)
+    })
+    return () => {
+      axiosInstance.interceptors.request.eject(requestInterceptors)
+      axiosInstance.interceptors.response.eject(refreshTokenInterceptor)
+    }
+  }, [])
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,8 +96,8 @@ export default function App() {
                     >
                       <AccordionTrigger className="flex w-full justify-end gap-8 hover:no-underline">
                         <div className="flex w-full gap-20">
-                          <p>{e.JobSource.name}</p>
-                          <p>{e.jobId}</p>
+                          <p>{e?.JobSource?.name}</p>
+                          <p>{e?.jobId}</p>
                         </div>
                         <Button className="bg-[#222222] hover:bg-[#222222]/60 px-8">
                           View
