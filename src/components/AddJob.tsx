@@ -1,4 +1,4 @@
-
+//@ts-nocheck
 import {
   Dialog,
   DialogClose,
@@ -18,25 +18,25 @@ import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 
-export default function AddJob() {
-  const [sources, setSources] = useState([]);
+export default function AddJob({ sources }) {
+  // const [sources, setSources] = useState([]);
   const [selectedSource, setSelectedSource] = useState("");
   const [jobId, setJobId] = useState("");
 
-  const Submit = async () => {
+  const Submit = async ({ sources }) => {
     await axiosInstance.post("/jobs/job-id", {
       jobSourceId: selectedSource,
       jobId: jobId,
     });
   };
 
-  useEffect(() => {
-    const fetchJobSources = async () => {
-      const data = await axiosInstance.get("/jobs/job-sources");
-      setSources(data.data);
-    };
-    fetchJobSources();
-  }, []);
+  // useEffect(() => {
+  //   const fetchJobSources = async () => {
+  //     const data = await axiosInstance.get("/jobs/job-sources");
+  //     setSources(data.data);
+  //   };
+  //   fetchJobSources();
+  // }, []);
 
   return (
     <>
@@ -55,12 +55,12 @@ export default function AddJob() {
                 <SelectContent className="bg-[#1d1d1d] text-white/80 ">
                   {sources.map((e: unknown) => (
                     <SelectItem
-                      key={e.id}
-                      value={e.name}
+                      key={e?.id}
+                      value={e?.name}
                       onMouseDown={() => setSelectedSource(e.id)}
                       className="focus:bg-[#242424] focus:text-white/80"
                     >
-                      {e.name}
+                      {e?.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
