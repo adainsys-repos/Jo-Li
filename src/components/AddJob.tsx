@@ -17,26 +17,21 @@ import { Input } from "../components/ui/input";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
+import { useStore } from "../../context/store";
 
 export default function AddJob({ sources }) {
   // const [sources, setSources] = useState([]);
   const [selectedSource, setSelectedSource] = useState("");
   const [jobId, setJobId] = useState("");
+  const { updateJobs, setUpdateJobs } = useStore();
 
-  const Submit = async ({ sources }) => {
+  const Submit = async () => {
     await axiosInstance.post("/jobs/job-id", {
       jobSourceId: selectedSource,
       jobId: jobId,
     });
+    setUpdateJobs(!updateJobs);
   };
-
-  // useEffect(() => {
-  //   const fetchJobSources = async () => {
-  //     const data = await axiosInstance.get("/jobs/job-sources");
-  //     setSources(data.data);
-  //   };
-  //   fetchJobSources();
-  // }, []);
 
   return (
     <>

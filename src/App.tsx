@@ -13,6 +13,16 @@ import { Skeleton } from "./components/ui/skeleton";
 import Cookies from "js-cookie";
 import ManageUsers from "./components/ManageUsers";
 import { Separator } from "./components/ui/separator";
+import { useStore } from "../context/store";
+import { Plus, PlusCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "./components/ui/dialog";
+import { Input } from "./components/ui/input";
+import { Button } from "./components/ui/button";
 
 export default function App() {
   const [jobs, setJobs] = useState([]);
@@ -58,6 +68,21 @@ export default function App() {
     };
   }, []);
 
+  const { updateJobs } = useStore();
+  const [userEmail, setUserEmail] = useState("");
+  console.log(userEmail);
+
+  const addUser = async (jobId) => {
+    try {
+      const post = await axiosInstance.post("/jobs/add-user", {
+        jobId: jobId,
+        email: userEmail,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -72,7 +97,7 @@ export default function App() {
     };
 
     fetchData();
-  }, []);
+  }, [, updateJobs, userEmail]);
 
   return (
     <div className="w-10/12 h-full m-auto flex flex-col py-10 ">
@@ -108,9 +133,33 @@ export default function App() {
                         <AccordionTrigger className="flex w-full justify-end gap-8 hover:no-underline"></AccordionTrigger>
                       </div>
                       <AccordionContent className="space-y-3">
-                        <p className="text-white/85 text-base">
-                          Users in the Job
-                        </p>
+                        <Separator className="bg-[#1C1C1C]" />
+                        <div className="flex justify-between items-center">
+                          <p className="text-white/85 text-lg">
+                            Users in the Job
+                          </p>
+                          <Dialog>
+                            <DialogTrigger>
+                              <Plus className="text-blue-500 p-0.5 rounded-full text-5xl" />
+                            </DialogTrigger>
+                            <DialogContent className="bg-[#1d1d1d] text-white/90 border-none">
+                              <DialogTitle>Add User to Job</DialogTitle>
+                              <div className="space-y-6 py-4">
+                                <Input
+                                  placeholder="Email"
+                                  className="bg-[#1d1d1d] text-white/50"
+                                  onChange={(e) => setUserEmail(e.target.value)}
+                                />
+                              </div>
+                              <Button
+                                className="bg-blue-500 hover:bg-blue-500"
+                                onClick={() => addUser(e?.id)}
+                              >
+                                Add user
+                              </Button>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                         <div className="flex flex-col text-white/80 gap-2.5">
                           {e.Users.map((user) => (
                             <li>{user.email}</li>
