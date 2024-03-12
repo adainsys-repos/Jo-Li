@@ -48,11 +48,11 @@ export default function AddJob({ sources }) {
                   <SelectValue placeholder="Select a source" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1d1d1d] text-white/80 ">
-                  {sources.map((e: unknown) => (
+                  {sources.map((e) => (
                     <SelectItem
                       key={e?.id}
                       value={e?.name}
-                      onMouseDown={() => setSelectedSource(e.id)}
+                      onMouseDownCapture={() => setSelectedSource(e.id)}
                       className="focus:bg-[#242424] focus:text-white/80"
                     >
                       {e?.name}
