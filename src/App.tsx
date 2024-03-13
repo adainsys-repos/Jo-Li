@@ -17,6 +17,7 @@ import { useStore } from "../context/store";
 import { Plus, PlusCircle } from "lucide-react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogTitle,
   DialogTrigger,
@@ -68,9 +69,9 @@ export default function App() {
     };
   }, []);
 
-  const { updateJobs } = useStore();
+  const { updateJobs, updateUsers, setUpdateJobs } = useStore();
   const [userEmail, setUserEmail] = useState("");
-  console.log(userEmail);
+  console.log(updateJobs);
 
   const addUser = async (jobId) => {
     try {
@@ -78,6 +79,7 @@ export default function App() {
         jobId: jobId,
         email: userEmail,
       });
+      setUpdateJobs(true);
     } catch (e) {
       console.log(e);
     }
@@ -97,7 +99,7 @@ export default function App() {
     };
 
     fetchData();
-  }, [, updateJobs, userEmail]);
+  }, [, updateJobs, updateUsers]);
 
   return (
     <div className="w-10/12 h-full m-auto flex flex-col py-10 ">
@@ -151,12 +153,15 @@ export default function App() {
                                   onChange={(e) => setUserEmail(e.target.value)}
                                 />
                               </div>
-                              <Button
-                                className="bg-blue-500 hover:bg-blue-500"
-                                onClick={() => addUser(e?.id)}
-                              >
-                                Add user
-                              </Button>
+
+                              <DialogClose>
+                                <Button
+                                  className="bg-blue-500 hover:bg-blue-500"
+                                  onClick={() => addUser(e?.id)}
+                                >
+                                  Add user
+                                </Button>
+                              </DialogClose>
                             </DialogContent>
                           </Dialog>
                         </div>

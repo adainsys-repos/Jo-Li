@@ -12,4 +12,6 @@ export const useStore = create((set) => ({
   setAuthToken: (token: string) => set({ authToken: token }),
   updateJobs: "",
   setUpdateJobs: (token: string) => set({ updateJobs: token }),
+  updateUsers: false,
+  setUpdateUsers: (user: boolean) => set({ updateUsers: user }),
 }));
