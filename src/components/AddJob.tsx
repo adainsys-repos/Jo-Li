@@ -39,21 +39,21 @@ export default function AddJob({ sources }) {
         <DialogTrigger>
           <Button className="bg-blue-500 px-8">Add</Button>
         </DialogTrigger>
-        <DialogContent className="bg-[#1d1d1d] text-white/90 border-none">
+        <DialogContent className="bg-white dark:bg-[#1d1d1d] dark:text-white/90 border-none">
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <div className="pt-6">
             <div className="space-y-4 pb-8">
               <Select>
-                <SelectTrigger className="bg-[#1d1d1d] focus:ring-0 focus:ring-offset-0">
+                <SelectTrigger className="bg-white dark:bg-[#1d1d1d] focus:ring-0 focus:ring-offset-0">
                   <SelectValue placeholder="Select a source" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1d1d1d] text-white/80 ">
+                <SelectContent className="bg-white dark:bg-[#1d1d1d] text-black/80 dark:text-white/80 ">
                   {sources.map((e) => (
                     <SelectItem
                       key={e?.id}
                       value={e?.name}
                       onMouseDownCapture={() => setSelectedSource(e.id)}
-                      className="focus:bg-[#242424] focus:text-white/80"
+                      className="focus:bg-[#242424] dark:focus:bg-[#242424] focus:text-white dark:focus:text-white/80"
                     >
                       {e?.name}
                     </SelectItem>
@@ -62,7 +62,7 @@ export default function AddJob({ sources }) {
               </Select>
               <Input
                 placeholder="Job ID"
-                className="bg-[#1d1d1d] text-white/80"
+                className="dark:bg-[#1d1d1d] dark:text-white/80"
                 onChange={(e) => setJobId(e.target.value)}
               />
             </div>

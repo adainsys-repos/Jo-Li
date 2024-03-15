@@ -25,7 +25,6 @@ export default function SignIn() {
 
   const navigate = useNavigate();
 
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     try {
@@ -36,7 +35,9 @@ export default function SignIn() {
         })
         .then((res) => {
           Cookies.set("A_AccessToken", res.data.tokens.accessToken);
-          Cookies.set("A_RefreshToken", res.data.tokens.refreshToken, { expires: 3 });
+          Cookies.set("A_RefreshToken", res.data.tokens.refreshToken, {
+            expires: 3,
+          });
           navigate("/");
         });
     } catch (e) {
@@ -45,7 +46,7 @@ export default function SignIn() {
   }
   return (
     <div className="flex flex-col m-auto items-center justify-center max-w-6xl h-screen">
-      <div className="bg-[#1C1C1C] h-fit w-1/3 border border-slate-950 rounded-xl px-2.5 py-4 ">
+      <div className="bg-white dark:bg-[#1C1C1C] h-fit w-1/3 border border-slate-950 rounded-xl px-2.5 py-4 ">
         <h3 className="text-center text-2xl font-medium text-white/90 py-3">
           JoLi
         </h3>
@@ -106,4 +107,3 @@ export default function SignIn() {
     </div>
   );
 }
-

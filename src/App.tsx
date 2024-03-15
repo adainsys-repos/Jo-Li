@@ -39,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import { useRef } from "react";
 import {
@@ -63,6 +64,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./components/ui/dialog";
+
+import { Moon, Sun } from "lucide-react";
+
+import { useTheme } from "./components/theme-provider";
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -137,12 +142,12 @@ export const columns: ColumnDef<Payment>[] = [
         <DialogTrigger>
           <Plus className="text-blue-500 p-0.5 rounded-full text-5xl" />
         </DialogTrigger>
-        <DialogContent className="bg-[#1d1d1d] text-white/90 border-none">
+        <DialogContent className="bg-white dark:bg-[#1d1d1d] dark:text-white/90 border-none">
           <DialogTitle>Add User to Job</DialogTitle>
           <div className="space-y-6 py-4">
             <Input
               placeholder="Email"
-              className="bg-[#1d1d1d] text-white/50"
+              className="dark:bg-[#1d1d1d] text:text-white/50"
               onChange={(e) => setUserEmail(e.target.value)}
             />
           </div>
@@ -164,6 +169,7 @@ export const columns: ColumnDef<Payment>[] = [
 ];
 
 export default function App() {
+  const { setTheme } = useTheme();
   const [data, setJobs] = useState([]);
   const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -264,98 +270,125 @@ export default function App() {
   }, [, updateJobs, updateUsers]);
 
   return (
-    <div className="w-10/12 h-full m-auto flex flex-col py-10 ">
-      <div className="flex justify-between items-center">
-        <h4 className="text-white/90 text-2xl font-medium">Main Dashboard</h4>
-        <AddJob sources={sources} />
-      </div>
-      <div className="w-full">
-        <div className="flex items-center py-4">
-          <Input
-            placeholder="Filter Job Id..."
-            value={(table.getColumn("jobId")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("jobId")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <div className="w-10/12 h-10 m-auto flex flex-col py-10">
+        <div className="flex justify-between items-center">
+          <h4 className="text-black/90 dark:text-white text-2xl font-medium">
+            Main Dashboard
+          </h4>
+          <div className="flex gap-3">
+            <AddJob sources={sources} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="sr-only">Toggle theme</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  System
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+        <div className="w-full">
+          <div className="flex items-center py-4">
+            <Input
+              placeholder="Filter Job Id..."
+              value={
+                (table.getColumn("jobId")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("jobId")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="text-white/90 py-10">
+        {/* <div className="text-white/90 py-10">
         <Accordion type="single" className="space-y-4" collapsible>
           {loading ? (
             <>
@@ -425,7 +458,8 @@ export default function App() {
             </>
           )}
         </Accordion>
+      </div> */}
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
