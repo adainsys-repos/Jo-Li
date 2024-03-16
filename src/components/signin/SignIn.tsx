@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Moon, Sun } from "lucide-react";
 import axiosInstance from "../../../config/axiosInstance";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
@@ -46,10 +46,11 @@ export default function SignIn() {
   }
   return (
     <div className="flex flex-col m-auto items-center justify-center max-w-6xl h-screen">
-      <div className="bg-white dark:bg-[#1C1C1C] h-fit w-1/3 border border-slate-950 rounded-xl px-2.5 py-4 ">
-        <h3 className="text-center text-2xl font-medium text-white/90 py-3">
+      <div className=" dark:bg-white bg-[#1C1C1C] h-fit w-1/3 border border-slate-950 rounded-xl px-2.5 py-4 ">
+        <h3 className="text-center text-2xl font-medium dark:text-black text-white/90 py-3">
           JoLi
         </h3>
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -61,8 +62,11 @@ export default function SignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="bg-[#100C0C] flex gap-1 w-full items-center justify-center rounded-md px-2 ">
-                      <Mail className=" h-4  text-white/50" strokeWidth={1.5} />
+                    <div className="dark:bg-black/5 bg-[#100C0C] flex gap-1 w-full items-center justify-center rounded-md px-2 ">
+                      <Mail
+                        className=" h-4 dark:text-black/50  text-white/50"
+                        strokeWidth={1.5}
+                      />
 
                       <Input
                         autoComplete="off"
@@ -81,8 +85,11 @@ export default function SignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="bg-[#100C0C] flex gap-1 w-full items-center justify-center rounded-md px-2 ">
-                      <Lock className=" h-4  text-white/50" strokeWidth={1.5} />
+                    <div className="dark:bg-black/5 bg-[#100C0C] flex gap-1 w-full items-center justify-center rounded-md px-2 ">
+                      <Lock
+                        className=" h-4  dark:text-black/50  text-white/50"
+                        strokeWidth={1.5}
+                      />
 
                       <Input
                         type="password"
