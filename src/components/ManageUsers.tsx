@@ -32,9 +32,7 @@ export default function ManageUsers({
     <>
       <Sheet>
         <SheetTrigger>
-          <Button className="bg-[#222222] dark:bg-white hover:bg-[#222222]/60 px-8">
-            Manage
-          </Button>
+          <Button className="bg-black dark:bg-white px-8">Manage</Button>
         </SheetTrigger>
         <SheetContent className="bg-[#141414] text-white border-none">
           <SheetHeader>

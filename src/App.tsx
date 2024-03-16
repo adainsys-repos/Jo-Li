@@ -270,7 +270,7 @@ export default function App() {
   }, [, updateJobs, updateUsers]);
 
   return (
-    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <div className="w-10/12 h-10 m-auto flex flex-col py-10">
         <div className="flex justify-between items-center">
           <h4 className="text-black/90 dark:text-white text-2xl font-medium">
