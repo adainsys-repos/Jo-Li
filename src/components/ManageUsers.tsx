@@ -32,7 +32,7 @@ export default function ManageUsers({
   return (
     <>
       <Dialog>
-        <DialogTrigger className="flex items-center gap-2.5">
+        <DialogTrigger className="flex items-center gap-2.5 text-white bg-black/40 px-4 py-2 rounded-md">
           Manage
         </DialogTrigger>
         <DialogContent className="text- border-none">

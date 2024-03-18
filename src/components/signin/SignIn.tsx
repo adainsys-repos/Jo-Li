@@ -4,10 +4,11 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Lock, Mail, Moon, Sun } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import axiosInstance from "../../../config/axiosInstance";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   email: z.string().min(2).max(50),
@@ -26,7 +27,6 @@ export default function SignIn() {
   const navigate = useNavigate();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     try {
       await axiosInstance
         .post("/auth/sign-in", {
@@ -44,10 +44,13 @@ export default function SignIn() {
       console.log(e);
     }
   }
+
   return (
     <div className="flex flex-col m-auto items-center justify-center max-w-6xl h-screen">
       <div className="h-fit w-4/12 border border-slate-950 rounded-xl px-2.5 py-4">
-        <h3 className="text-center text-black/80 text-3xl font-bold py-3">JoLi</h3>
+        <h3 className="text-center text-black/80 text-3xl font-bold py-3">
+          JoLi
+        </h3>
 
         <Form {...form}>
           <form

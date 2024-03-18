@@ -35,7 +35,8 @@ import { useStore } from "../context/store";
 import { io } from "socket.io-client";
 import Users from "./components/Users";
 import { useDebounce } from "use-debounce";
-
+import { BrowserRouter, useNavigate } from "react-router-dom";
+import { Skeleton } from "./components/ui/skeleton";
 
 export default function App() {
   const [data, setJobs] = useState([]);
@@ -53,7 +54,6 @@ export default function App() {
   const [userEmail, setUserEmail] = useState("");
   const [searchData, setSearchData] = useState("");
   const [debounceData] = useDebounce(searchData, 500);
-
 
   useEffect(() => {
     const requestInterceptors = axiosInstance.interceptors.request.use(
@@ -139,8 +139,6 @@ export default function App() {
         params: {
           search: "",
           skip: currentPage,
-
-
           take: 10,
         },
       });
@@ -153,9 +151,6 @@ export default function App() {
       socket.disconnect();
     };
   }, []);
-
-
-
 
   const handleEnable = async (jobId: any) => {
     try {
@@ -238,7 +233,9 @@ export default function App() {
       accessorKey: "maxLogins",
       header: "User Logins",
       cell: ({ row }) => (
-        <div className="font-medium">{row.original.activeLogins} / {row.original.maxLogins} </div>
+        <div className="font-medium">
+          {row.original.activeLogins} / {row.original.maxLogins}{" "}
+        </div>
       ),
     },
 
@@ -248,7 +245,6 @@ export default function App() {
       cell: ({ row }) => (
         <>
           {row.original.Cookies === null ? (
-
             <Button
               size="sm"
               onClick={() => handleEnable(row.original.id)}
@@ -257,8 +253,6 @@ export default function App() {
             >
               Enable
             </Button>
-
-
           ) : (
             <Button
               size="sm"
@@ -284,7 +278,6 @@ export default function App() {
     },
   ];
 
-
   const table = useReactTable({
     data,
     columns,
@@ -304,7 +297,7 @@ export default function App() {
     },
   });
 
-
+  const navigate = useNavigate();
 
   return (
     <div className="w-10/12 h-10 m-auto flex flex-col py-10">
@@ -312,6 +305,15 @@ export default function App() {
         <h4 className="text-black/80  text-2xl font-bold">Main Dashboard</h4>
         <div className="flex gap-3">
           <AddJob sources={sources} />
+          <Button
+            onClick={() => {
+              Cookies.remove("A_AccessToken");
+              navigate("/signin");
+            }}
+            className="bg-red-700/80 hover:bg-red-800/90"
+          >
+            Logout
+          </Button>
         </div>
       </div>
       <div className="w-full">
@@ -339,9 +341,9 @@ export default function App() {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                       </TableHead>
                     );
                   })}
@@ -349,23 +351,35 @@ export default function App() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    className="font-medium text-black/70"
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+              {data ? (
+                loading ? (
+                  [1, 2, 3, 4, 5].map(() => (
+                    <TableRow className="font-medium text-black/70 h-20">
+                      {columns.map((column) => (
+                        <TableCell key={column.id}>
+                          <Skeleton className="w-full h-2 bg-black/10" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      className="font-medium text-black/70"
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )
               ) : (
                 <TableRow>
                   <TableCell
