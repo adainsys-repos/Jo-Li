@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import {
   ColumnDef,
@@ -25,7 +24,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-
 import { useRef } from "react";
 import { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosInstance";
@@ -34,8 +32,9 @@ import AddJob from "./components/AddJob";
 import Cookies from "js-cookie";
 import ManageUsers from "./components/ManageUsers";
 import { useStore } from "../context/store";
-import { io } from "socket.io-client"
+import { io } from "socket.io-client";
 import Users from "./components/Users";
+import { useDebounce } from "use-debounce";
 
 
 export default function App() {
@@ -50,6 +49,12 @@ export default function App() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const { updateJobs, updateUsers, setUpdateJobs } = useStore();
+  const [userEmail, setUserEmail] = useState("");
+  const [searchData, setSearchData] = useState("");
+  const [debounceData] = useDebounce(searchData, 500);
+  const [activate, setActivate] = useState("");
+  const [deActivate, setDeactivate] = useState("");
 
 
   useEffect(() => {
@@ -110,7 +115,7 @@ export default function App() {
     try {
       const jobData = await axiosInstance.get("/jobs/all-jobIds", {
         params: {
-          search: "",
+          search: debounceData,
           skip: currentPage,
           take: 10,
         },
@@ -126,13 +131,12 @@ export default function App() {
 
   useEffect(() => {
     fetchData();
-  }, [updateJobs, updateUsers, currentPage]);
-
+  }, [debounceData, updateJobs, updateUsers, currentPage]);
 
   useEffect(() => {
-    const socket = io('http://localhost:8000');
+    const socket = io("http://localhost:8000");
 
-    socket.on('user-login-state', async (user: any) => {
+    socket.on("user-login-state", async (user: any) => {
       console.log(console.log(user));
       const jobData = await axiosInstance.get("/jobs/all-jobIds", {
         params: {
@@ -318,9 +322,10 @@ export default function App() {
           <Input
             placeholder="Filter Job Id..."
             value={(table.getColumn("jobId")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("jobId")?.setFilterValue(event.target.value)
-            }
+            onChange={(event) => {
+              table.getColumn("jobId")?.setFilterValue(event.target.value);
+              setSearchData(event.target.value);
+            }}
             className="max-w-sm"
           />
         </div>
