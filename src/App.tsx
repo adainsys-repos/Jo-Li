@@ -1,12 +1,5 @@
-//@ts-nocheck
-"use client";
+
 import * as React from "react";
-import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
-import { FaUser } from "react-icons/fa";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -21,15 +14,7 @@ import {
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -39,33 +24,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ThemeProvider } from "@/components/theme-provider";
+
 
 import { useRef } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosInstance";
 import AddJob from "./components/AddJob";
 import { Skeleton } from "./components/ui/skeleton";
 import Cookies from "js-cookie";
 import ManageUsers from "./components/ManageUsers";
-import { Separator } from "./components/ui/separator";
 import { useStore } from "../context/store";
-import { Plus, PlusCircle } from "lucide-react";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "./components/ui/dialog";
-
-import { Moon, Sun } from "lucide-react";
+import { io } from "socket.io-client"
 import Users from "./components/Users";
 
 export const columns: ColumnDef<Payment>[] = [
@@ -107,21 +76,15 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "maxLogins",
-    header: "Max Logins",
+    header: "User Logins",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("maxLogins")}</div>
+      <div className="font-medium">{row.original.activeLogins} / {row.original.maxLogins} </div>
     ),
   },
-  {
-    accessorKey: "activeLogins",
-    header: "Active Logins",
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("activeLogins")}</div>
-    ),
-  },
+
   {
     accessorKey: "Approve",
-    header: "Approve",
+    header: "Cookie Action",
     cell: ({ row }) => (
       <>
         {row.original.Cookies === null ? (
@@ -264,7 +227,30 @@ export default function App() {
 
   useEffect(() => {
     fetchData();
-  }, [updateJobs, updateUsers,currentPage]);
+  }, [updateJobs, updateUsers, currentPage]);
+
+
+  useEffect(() => {
+    const socket = io('http://localhost:8000');
+
+    socket.on('user-login-state', async (user: any) => {
+      console.log(console.log(user));
+      const jobData = await axiosInstance.get("/jobs/all-jobIds", {
+        params: {
+          search: "",
+          skip: currentPage,
+          take: 10,
+        },
+      });
+      const sourceData = await axiosInstance.get("/jobs/job-sources");
+      setJobs(jobData.data.jobs);
+      setSources(sourceData.data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <div className="w-10/12 h-10 m-auto flex flex-col py-10">
@@ -299,9 +285,9 @@ export default function App() {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}
