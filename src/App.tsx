@@ -30,96 +30,13 @@ import { useRef } from "react";
 import { useEffect, useState } from "react";
 import axiosInstance from "../config/axiosInstance";
 import AddJob from "./components/AddJob";
-import { Skeleton } from "./components/ui/skeleton";
+
 import Cookies from "js-cookie";
 import ManageUsers from "./components/ManageUsers";
 import { useStore } from "../context/store";
 import { io } from "socket.io-client"
 import Users from "./components/Users";
 
-export const columns: ColumnDef<Payment>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "JobSource",
-    header: "Job Source",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("JobSource").name}</div>
-    ),
-  },
-  {
-    accessorKey: "jobId",
-    header: "Job ID",
-    cell: ({ row }) => (
-      <div className="text-indigo-600">{row.getValue("jobId")}</div>
-    ),
-  },
-  {
-    accessorKey: "maxLogins",
-    header: "User Logins",
-    cell: ({ row }) => (
-      <div className="font-medium">{row.original.activeLogins} / {row.original.maxLogins} </div>
-    ),
-  },
-
-  {
-    accessorKey: "Approve",
-    header: "Cookie Action",
-    cell: ({ row }) => (
-      <>
-        {row.original.Cookies === null ? (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 w-20 font-normal border-none bg-purple-500 hover:bg-purple-600 hover:text-white text-white"
-            onClick={() => row.toggleAllSelected()}
-          >
-            Enable
-          </Button>
-        ) : (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 w-20 font-normal border-none bg-rose-500 hover:bg-rose-600 hover:text-white text-white"
-            onClick={() => row.toggleAllSelected()}
-          >
-            Disable
-          </Button>
-        )}
-      </>
-    ),
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => <ManageUsers jobs={row.original} />,
-  },
-  {
-    id: "usersDropdown",
-    header: "Users",
-    cell: ({ row }) => <Users jobs={row.original} />,
-  },
-];
 
 export default function App() {
   const [data, setJobs] = useState([]);
@@ -134,24 +51,6 @@ export default function App() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
 
   useEffect(() => {
     const requestInterceptors = axiosInstance.interceptors.request.use(
@@ -191,7 +90,7 @@ export default function App() {
   }, []);
 
   const { updateJobs, updateUsers, setUpdateJobs } = useStore();
-  const [userEmail, setUserEmail] = useState("");
+  const [jobSourceUserEmail, setJobSourceUserEmail] = useState("");
 
   const addUser = async (jobId) => {
     try {
@@ -239,6 +138,8 @@ export default function App() {
         params: {
           search: "",
           skip: currentPage,
+
+
           take: 10,
         },
       });
@@ -251,6 +152,158 @@ export default function App() {
       socket.disconnect();
     };
   }, []);
+
+
+
+
+  const handleEnable = async (jobId: any) => {
+    try {
+      await axiosInstance.post("/cookies/open", {
+        jobId: jobId,
+      });
+      const jobData = await axiosInstance.get("/jobs/all-jobIds", {
+        params: {
+          search: "",
+          skip: currentPage,
+          take: 10,
+        },
+      });
+      const sourceData = await axiosInstance.get("/jobs/job-sources");
+      setJobs(jobData.data.jobs);
+      setSources(sourceData.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDisable = async (jobId: any) => {
+    try {
+      await axiosInstance.put("/jobs/clean-jobId-cookie", {
+        jobId: jobId,
+      });
+      const jobData = await axiosInstance.get("/jobs/all-jobIds", {
+        params: {
+          search: "",
+          skip: currentPage,
+          take: 10,
+        },
+      });
+      const sourceData = await axiosInstance.get("/jobs/job-sources");
+      setJobs(jobData.data.jobs);
+      setSources(sourceData.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const columns: ColumnDef<Payment>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "JobSource",
+      header: "Job Source",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("JobSource").name}</div>
+      ),
+    },
+    {
+      accessorKey: "jobId",
+      header: "Job ID",
+      cell: ({ row }) => (
+        <div className="text-indigo-600">{row.getValue("jobId")}</div>
+      ),
+    },
+    {
+      accessorKey: "maxLogins",
+      header: "User Logins",
+      cell: ({ row }) => (
+        <div className="font-medium">{row.original.activeLogins} / {row.original.maxLogins} </div>
+      ),
+    },
+
+    {
+      accessorKey: "Approve",
+      header: "Cookie Action",
+      cell: ({ row }) => (
+        <>
+          {row.original.Cookies === null ? (
+
+            <Button
+              size="sm"
+              onClick={() => handleEnable(row.original.id)}
+              variant="outline"
+              className="h-8 w-20 font-normal border-none bg-purple-500 hover:bg-purple-600 hover:text-white text-white"
+            >
+              Enable
+            </Button>
+
+
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 w-20 font-normal border-none bg-rose-500 hover:bg-rose-600 hover:text-white text-white"
+              onClick={() => handleDisable(row.original.id)}
+            >
+              Disable
+            </Button>
+          )}
+        </>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => <ManageUsers jobs={row.original} />,
+    },
+    {
+      id: "usersDropdown",
+      header: "Users",
+      cell: ({ row }) => <Users jobs={row.original} />,
+    },
+  ];
+
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
+
+
 
   return (
     <div className="w-10/12 h-10 m-auto flex flex-col py-10">
