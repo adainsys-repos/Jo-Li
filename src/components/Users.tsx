@@ -22,8 +22,6 @@ export default function Users({
   const [userEmail, setUserEmail] = useState("");
   const { setUpdateJobs } = useStore();
 
-  console.log(jobs);
-
   const addUser = async (jobId: any) => {
     try {
       await axiosInstance.post("/jobs/add-user", {
@@ -56,7 +54,8 @@ export default function Users({
                     console.log(job),
                     (
                       <div className="flex items-center gap-2">
-                        <Mail className="text-black/70" size={18} /> {job?.User?.email}
+                        <Mail className="text-black/70" size={18} />{" "}
+                        {job?.User?.email}
                       </div>
                     )
                   )
