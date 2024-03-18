@@ -46,10 +46,8 @@ export default function SignIn() {
   }
   return (
     <div className="flex flex-col m-auto items-center justify-center max-w-6xl h-screen">
-      <div className=" dark:bg-white bg-[#1C1C1C] h-fit w-1/3 border border-slate-950 rounded-xl px-2.5 py-4 ">
-        <h3 className="text-center text-2xl font-medium dark:text-black text-white/90 py-3">
-          JoLi
-        </h3>
+      <div className="h-fit w-4/12 border border-slate-950 rounded-xl px-2.5 py-4">
+        <h3 className="text-center text-black/80 text-3xl font-bold py-3">JoLi</h3>
 
         <Form {...form}>
           <form
@@ -62,15 +60,12 @@ export default function SignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="dark:bg-black/5 bg-[#100C0C] flex gap-1 w-full items-center justify-center rounded-md px-2 ">
-                      <Mail
-                        className=" h-4 dark:text-black/50  text-white/50"
-                        strokeWidth={1.5}
-                      />
+                    <div className="bg-black/5 flex gap-1 w-full items-center justify-center rounded-md px-2 ">
+                      <Mail className=" h-4 text-black/50" strokeWidth={1.5} />
 
                       <Input
                         autoComplete="off"
-                        className="text-white/50 bg-transparent focus-visible:bg-none relative border-none focus-visible:ring-none px-0 "
+                        className=" bg-transparent focus-visible:bg-none relative border-none focus-visible:ring-none px-0 "
                         placeholder="email address"
                         {...field}
                       />
@@ -85,15 +80,15 @@ export default function SignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="dark:bg-black/5 bg-[#100C0C] flex gap-1 w-full items-center justify-center rounded-md px-2 ">
+                    <div className="bg-black/5 flex gap-1 w-full items-center justify-center rounded-md px-2 ">
                       <Lock
-                        className=" h-4  dark:text-black/50  text-white/50"
+                        className=" h-4 text-black/50  "
                         strokeWidth={1.5}
                       />
 
                       <Input
                         type="password"
-                        className="text-white/50 bg-transparent relative border-none focus-visible:border-none focus-visible:ring-none px-0 "
+                        className=" bg-transparent relative border-none focus-visible:border-none focus-visible:ring-none px-0 "
                         placeholder="Password"
                         {...field}
                       />

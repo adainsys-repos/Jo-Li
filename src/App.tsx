@@ -66,9 +66,7 @@ import {
 } from "./components/ui/dialog";
 
 import { Moon, Sun } from "lucide-react";
-
-import { useTheme } from "./components/theme-provider";
-import ModeToggle from "./components/ModeToggle";
+import Users from "./components/Users";
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -113,59 +111,14 @@ export const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    id: "usersDropdown",
-    header: "Users",
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="p-2 focus:outline-none">
-            <FaUser className="h-4 w-4" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {row.original.Users.map((user) => (
-            <DropdownMenuItem key={user.id}>{user.email}</DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => <ManageUsers jobs={row.original} />,
   },
   {
-    accessorKey: "addUsers",
-    header: "Add User",
-    cell: ({ row }) => (
-      <Dialog>
-        <DialogTrigger>
-          <Plus className="text-blue-500 p-0.5 rounded-full text-5xl" />
-        </DialogTrigger>
-        <DialogContent className="bg-white dark:bg-[#1d1d1d] dark:text-white/90 border-none">
-          <DialogTitle>Add User to Job</DialogTitle>
-          <div className="space-y-6 py-4">
-            <Input
-              placeholder="Email"
-              className="dark:bg-[#1d1d1d] text:text-white/50"
-              onChange={(e) => setUserEmail(e.target.value)}
-            />
-          </div>
-
-          <DialogClose>
-            <Button
-              className="bg-blue-500 hover:bg-blue-500"
-              onClick={() => {
-                addUser(row.original.id);
-              }}
-            >
-              Add user
-            </Button>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
-    ),
+    id: "usersDropdown",
+    header: "Users",
+    cell: ({ row }) => <Users jobs={row.original} />,
   },
 ];
 
@@ -253,123 +206,124 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const jobData = await axiosInstance.get("/jobs/all-jobIds");
-        const sourceData = await axiosInstance.get("/jobs/job-sources");
-        setJobs(jobData.data);
-        setSources(sourceData.data);
-        setLoading(false);
-      } catch (e) {
-        console.log(e);
-      }
-    };
+  const [currentPage, setCurrentPage] = useState(0);
 
+  const fetchData = async () => {
+    try {
+      const jobData = await axiosInstance.get("/jobs/all-jobIds", {
+        params: {
+          search: "",
+          skip: 0,
+          take: 20,
+        },
+      });
+      const sourceData = await axiosInstance.get("/jobs/job-sources");
+      setJobs(jobData.data.jobs);
+      setSources(sourceData.data);
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
-  }, [, updateJobs, updateUsers]);
+  }, [updateJobs, updateUsers]);
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="w-10/12 h-10 m-auto flex flex-col py-10">
-        <div className="flex justify-between items-center">
-          <h4 className="text-black/90 dark:text-white text-2xl font-medium">
-            Main Dashboard
-          </h4>
-          <div className="flex gap-3">
-            <AddJob sources={sources} />
-            <ModeToggle />
+    <div className="w-10/12 h-10 m-auto flex flex-col py-10">
+      <div className="flex justify-between items-center">
+        <h4 className="text-black/80  text-2xl font-bold">Main Dashboard</h4>
+        <div className="flex gap-3">
+          <AddJob sources={sources} />
+        </div>
+      </div>
+      <div className="w-full">
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter Job Id..."
+            value={(table.getColumn("jobId")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("jobId")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        </div>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchData({ skip: 5 })}
+            >
+              Next
+            </Button>
           </div>
         </div>
-        <div className="w-full">
-          <div className="flex items-center py-4">
-            <Input
-              placeholder="Filter Job Id..."
-              value={
-                (table.getColumn("jobId")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table.getColumn("jobId")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm"
-            />
-          </div>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        </div>
-        {/* <div className="text-white/90 py-10">
+      </div>
+      {/* <div className="text-white/90 py-10">
         <Accordion type="single" className="space-y-4" collapsible>
           {loading ? (
             <>
@@ -440,7 +394,6 @@ export default function App() {
           )}
         </Accordion>
       </div> */}
-      </div>
-    </ThemeProvider>
+    </div>
   );
 }

@@ -10,8 +10,8 @@ export type storeTypes = {
 export const useStore = create((set) => ({
   authToken: "",
   setAuthToken: (token: string) => set({ authToken: token }),
-  updateJobs: "",
-  setUpdateJobs: (token: string) => set({ updateJobs: token }),
+  updateJobs: false,
+  setUpdateJobs: (token: boolean) => set({ updateJobs: token }),
   updateUsers: false,
   setUpdateUsers: (user: boolean) => set({ updateUsers: user }),
 }));
