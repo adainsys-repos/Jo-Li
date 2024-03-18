@@ -112,7 +112,7 @@ export default function App() {
     try {
       const jobData = await axiosInstance.get("/jobs/all-jobIds", {
         params: {
-          search: debounceData,
+          search: debounceData ?? "",
           skip: currentPage,
           take: 10,
         },
@@ -318,9 +318,8 @@ export default function App() {
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter Job Id..."
-            value={(table.getColumn("jobId")?.getFilterValue() as string) ?? ""}
+            value={searchData}
             onChange={(event) => {
-              table.getColumn("jobId")?.setFilterValue(event.target.value);
               setSearchData(event.target.value);
             }}
             className="max-w-sm"
