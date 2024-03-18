@@ -53,8 +53,6 @@ export default function App() {
   const [userEmail, setUserEmail] = useState("");
   const [searchData, setSearchData] = useState("");
   const [debounceData] = useDebounce(searchData, 500);
-  const [activate, setActivate] = useState("");
-  const [deActivate, setDeactivate] = useState("");
 
 
   useEffect(() => {
@@ -94,20 +92,19 @@ export default function App() {
     };
   }, []);
 
-  const { updateJobs, updateUsers, setUpdateJobs } = useStore();
-  const [jobSourceUserEmail, setJobSourceUserEmail] = useState("");
+  // const { updateJobs, updateUsers, setUpdateJobs } = useStore();
 
-  const addUser = async (jobId) => {
-    try {
-      const post = await axiosInstance.post("/jobs/add-user", {
-        jobId: jobId,
-        email: userEmail,
-      });
-      setUpdateJobs(true);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  // const addUser = async (jobId) => {
+  //   try {
+  //     const post = await axiosInstance.post("/jobs/add-user", {
+  //       jobId: jobId,
+  //       email: userEmail,
+  //     });
+  //     setUpdateJobs(true);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   const [currentPage, setCurrentPage] = useState(0);
 

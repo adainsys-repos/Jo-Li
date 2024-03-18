@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
 export type storeTypes = {
-  authToken: String;
-  setAuthToken: (token: string) => String;
-  updateJobs: String;
-  setUpdateJobs: (token: string) => String;
+  authToken: string;
+  setAuthToken: (token: string) => string;
+  updateJobs: string;
+  setUpdateJobs: (token: string) => string;
 };
 
 export const useStore = create((set) => ({
