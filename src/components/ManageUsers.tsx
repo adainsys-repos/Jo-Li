@@ -14,7 +14,7 @@ import axiosInstance from "../../config/axiosInstance";
 export default function ManageUsers({
   jobs,
 }: {
-  jobs: { id: string; Users: any[] };
+  jobs: { id: string; Users: any[]; maxLogins: number };
 }) {
   const [maxLogins, setMaxLogins] = useState(0);
 
@@ -32,7 +32,9 @@ export default function ManageUsers({
   return (
     <>
       <Dialog>
-        <DialogTrigger>Manage</DialogTrigger>
+        <DialogTrigger className="flex items-center gap-2.5">
+          Manage
+        </DialogTrigger>
         <DialogContent className="text- border-none">
           <DialogHeader>
             <DialogTitle>Edit Max Logins For the Job</DialogTitle>
@@ -40,7 +42,7 @@ export default function ManageUsers({
               <div className="space-y-4">
                 <Input
                   onChange={(e: any) => setMaxLogins(e.target.value)}
-                  placeholder="Max number of logins allowed"
+                  placeholder={jobs.maxLogins.toString()}
                   className="bg-black/10 border-[#6e6e6e]"
                 />
                 <Button

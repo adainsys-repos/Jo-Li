@@ -101,13 +101,49 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "jobId",
     header: "Job ID",
-    cell: ({ row }) => <div className="lowercase">{row.getValue("jobId")}</div>,
+    cell: ({ row }) => (
+      <div className="text-indigo-600">{row.getValue("jobId")}</div>
+    ),
   },
   {
     accessorKey: "maxLogins",
     header: "Max Logins",
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("maxLogins")}</div>
+    ),
+  },
+  {
+    accessorKey: "activeLogins",
+    header: "Active Logins",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("activeLogins")}</div>
+    ),
+  },
+  {
+    accessorKey: "Approve",
+    header: "Approve",
+    cell: ({ row }) => (
+      <>
+        {row.original.Cookies === null ? (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 w-20 font-normal border-none bg-purple-500 hover:bg-purple-600 hover:text-white text-white"
+            onClick={() => row.toggleAllSelected()}
+          >
+            Enable
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 w-20 font-normal border-none bg-rose-500 hover:bg-rose-600 hover:text-white text-white"
+            onClick={() => row.toggleAllSelected()}
+          >
+            Disable
+          </Button>
+        )}
+      </>
     ),
   },
   {
@@ -213,8 +249,8 @@ export default function App() {
       const jobData = await axiosInstance.get("/jobs/all-jobIds", {
         params: {
           search: "",
-          skip: 0,
-          take: 20,
+          skip: currentPage,
+          take: 10,
         },
       });
       const sourceData = await axiosInstance.get("/jobs/job-sources");
@@ -228,7 +264,7 @@ export default function App() {
 
   useEffect(() => {
     fetchData();
-  }, [updateJobs, updateUsers]);
+  }, [updateJobs, updateUsers,currentPage]);
 
   return (
     <div className="w-10/12 h-10 m-auto flex flex-col py-10">
@@ -251,12 +287,15 @@ export default function App() {
         </div>
         <div className="rounded-md border">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-gray-200">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id}>
+                      <TableHead
+                        key={header.id}
+                        className="font-medium text-black/80"
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -273,6 +312,7 @@ export default function App() {
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
+                    className="font-medium text-black/70"
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
@@ -308,92 +348,26 @@ export default function App() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => {
+                setCurrentPage((old) => old - 10);
+              }}
+              disabled={currentPage === 0}
             >
               Previous
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => fetchData({ skip: 5 })}
+              onClick={() => {
+                setCurrentPage((old) => old + 10);
+              }}
+              disabled={table.getFilteredRowModel().rows.length < 10}
             >
               Next
             </Button>
           </div>
         </div>
       </div>
-      {/* <div className="text-white/90 py-10">
-        <Accordion type="single" className="space-y-4" collapsible>
-          {loading ? (
-            <>
-              <div className="space-y-6">
-                <Skeleton className="w-full h-14 bg-[#1C1C1C]" />
-                <Skeleton className="w-full h-14 bg-[#1C1C1C]" />
-                <Skeleton className="w-full h-14 bg-[#1C1C1C]" />
-              </div>
-            </>
-          ) : (
-            <>
-              {data &&
-                data.map((e) => (
-                  <>
-                    <AccordionItem
-                      value={e}
-                      className="bg-black border border-[#1C1C1C] flex flex-col px-8 rounded-lg"
-                    >
-                      <div className="flex w-full gap-4 items-center py-3">
-                        <div className="flex w-full gap-20">
-                          <p>{e?.JobSource?.name}</p>
-                          <p>{e?.jobId}</p>
-                        </div>
-                        <ManageUsers jobs={e} />
-                        <AccordionTrigger className="flex w-full justify-end gap-8 hover:no-underline"></AccordionTrigger>
-                      </div>
-                      <AccordionContent className="space-y-3">
-                        <Separator className="bg-[#1C1C1C]" />
-                        <div className="flex justify-between items-center">
-                          <p className="text-white/85 text-lg">
-                            Users in the Job
-                          </p>
-                          <Dialog>
-                            <DialogTrigger>
-                              <Plus className="text-blue-500 p-0.5 rounded-full text-5xl" />
-                            </DialogTrigger>
-                            <DialogContent className="bg-[#1d1d1d] text-white/90 border-none">
-                              <DialogTitle>Add User to Job</DialogTitle>
-                              <div className="space-y-6 py-4">
-                                <Input
-                                  placeholder="Email"
-                                  className="bg-[#1d1d1d] text-white/50"
-                                  onChange={(e) => setUserEmail(e.target.value)}
-                                />
-                              </div>
-
-                              <DialogClose>
-                                <Button
-                                  className="bg-blue-500 hover:bg-blue-500"
-                                  onClick={() => addUser(e?.id)}
-                                >
-                                  Add user
-                                </Button>
-                              </DialogClose>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                        <div className="flex flex-col text-white/80 gap-2.5">
-                          {e.Users.map((user) => (
-                            <li>{user.email}</li>
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </>
-                ))}
-            </>
-          )}
-        </Accordion>
-      </div> */}
     </div>
   );
 }

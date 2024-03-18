@@ -12,6 +12,7 @@ import { useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { FaUser } from "react-icons/fa";
 import { useStore } from "../../context/store";
+import { Mail } from "lucide-react";
 
 export default function Users({
   jobs,
@@ -30,6 +31,7 @@ export default function Users({
         email: userEmail,
       });
       setUpdateJobs(true);
+      userEmail("");
     } catch (e) {
       console.log(e);
     }
@@ -49,9 +51,16 @@ export default function Users({
             <div className="space-y-10 py-4">
               <div className="space-y-2">
                 <p className="text-lg text-black/90 font-medium">Users</p>
-                {jobs?.Users.map((job) => (
-                  <li className="text-black/90">{job.email}</li>
-                ))}
+                {jobs?.userJobConnections?.map(
+                  (job) => (
+                    console.log(job),
+                    (
+                      <div className="flex items-center gap-2">
+                        <Mail className="text-black/70" size={18} /> {job?.User?.email}
+                      </div>
+                    )
+                  )
+                )}
               </div>
               <div className="space-y-1.5">
                 <p className="text-black/90 text-lg font-medium">Add User</p>
