@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import axiosInstance from "../../../config/axiosInstance";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const formSchema = z.object({
@@ -16,6 +16,18 @@ const formSchema = z.object({
 });
 
 export default function SignIn() {
+
+  const { pathname } = useLocation()
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(pathname)
+    if (pathname === "/signin" && Cookies.get("A_AccessToken")) {
+      navigate("/");
+    }
+  }, [pathname]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -24,7 +36,7 @@ export default function SignIn() {
     },
   });
 
-  const navigate = useNavigate();
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
