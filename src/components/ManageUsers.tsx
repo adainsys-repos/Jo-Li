@@ -1,5 +1,6 @@
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -45,14 +46,16 @@ export default function ManageUsers({
                   placeholder={jobs.maxLogins.toString()}
                   className="bg-black/10 border-[#6e6e6e]"
                 />
-                <Button
-                  className="bg-blue-600 hover:bg-blue-500 px-8 float-right"
-                  onClick={() => editMaxLogins()}
-                >
-                  Save
-                </Button>
               </div>
             </div>
+            <DialogClose>
+              <Button
+                className="bg-blue-600 hover:bg-blue-500 px-8 float-right"
+                onClick={() => editMaxLogins()}
+              >
+                Save
+              </Button>
+            </DialogClose>
           </DialogHeader>
         </DialogContent>
       </Dialog>
