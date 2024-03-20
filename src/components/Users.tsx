@@ -60,7 +60,9 @@ export default function Users({
                     (
                       <div className="flex items-center gap-2">
                         <Mail className="text-black/70" size={18} />{" "}
-                        {job?.User?.email} {job.isActivated && <div className="flex ml-auto gap-2"><span className="text-purple-500 font-semibold ml-auto text-sm p-2">Active</span> <button type="button" onClick={() => { handleDeactivate({ email: job?.User?.email, jobId: jobs?.id }) }} className="p-2 rounded-md bg-red-500 text-sm text-white">Deactivate</button></div>}
+                        {job?.User?.email} {job.isActivated && <div className="flex ml-auto gap-2"><span className="text-purple-500 font-semibold ml-auto text-sm p-2">Active</span>
+                          {/* <button type="button" onClick={() => { handleDeactivate({ email: job?.User?.email, jobId: jobs?.id }) }} className="p-2 rounded-md bg-red-500 text-sm text-white">Deactivate</button> */}
+                        </div>}
                       </div>
                     )
                   )
