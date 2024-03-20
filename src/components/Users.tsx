@@ -42,19 +42,18 @@ export default function Users({
             <FaUser className="h-4 w-4 text-black" />
           </Button>
         </SheetTrigger>
-        <SheetContent className="border-none">
+        <SheetContent className="border-none !max-w-[30vw]">
           <SheetHeader>
-            <SheetTitle className="text-black/90">Edit Users</SheetTitle>
+            <SheetTitle className="text-black/90">Users</SheetTitle>
             <div className="space-y-10 py-4">
               <div className="space-y-2">
-                <p className="text-lg text-black/90 font-medium">Users</p>
                 {jobs?.userJobConnections?.map(
                   (job) => (
                     console.log(job),
                     (
                       <div className="flex items-center gap-2">
                         <Mail className="text-black/70" size={18} />{" "}
-                        {job?.User?.email}
+                        {job?.User?.email} {job.isActivated && <div className="flex ml-auto gap-2"><span className="text-purple-500 font-semibold ml-auto text-sm p-2">Active</span> <button className="p-2 rounded-md bg-red-500 text-sm text-white">Deactivate</button></div>}
                       </div>
                     )
                   )
