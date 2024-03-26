@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import {
   ColumnDef,
@@ -35,8 +36,9 @@ import { useStore } from "../context/store";
 import { io } from "socket.io-client";
 import Users from "./components/Users";
 import { useDebounce } from "use-debounce";
-import { BrowserRouter, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Skeleton } from "./components/ui/skeleton";
+import { Progress } from "./components/ui/progress";
 
 export default function App() {
   const [data, setJobs] = useState([]);
@@ -51,7 +53,6 @@ export default function App() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const { updateJobs, updateUsers, setUpdateJobs } = useStore();
-  const [userEmail, setUserEmail] = useState("");
   const [searchData, setSearchData] = useState("");
   const [debounceData] = useDebounce(searchData, 500);
 
@@ -193,33 +194,36 @@ export default function App() {
   };
 
   const columns: ColumnDef<Payment>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
+    // {
+    //   id: "select",
+    //   header: ({ table }) => (
+    //     <Checkbox
+    //       checked={
+    //         table.getIsAllPageRowsSelected() ||
+    //         (table.getIsSomePageRowsSelected() && "indeterminate")
+    //       }
+    //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //       aria-label="Select all"
+    //     />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <Checkbox
+    //       checked={row.getIsSelected()}
+    //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //       aria-label="Select row"
+    //     />
+    //   ),
+    //   enableSorting: false,
+    //   enableHiding: false,
+    // },
     {
       accessorKey: "JobSource",
       header: "Job Source",
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("JobSource").name}</div>
+        <div className="capitalize">
+          {row.getValue("JobSource").name === "Monster" ? <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Foundit-Logo.svg/1280px-Foundit-Logo.svg.png" alt="Logo" className="w-12" /> : <img src="https://static.naukimg.com/s/0/0/i/ni-hamburger/NaukriLogo.png" alt="Logo" className="w-12" />}
+          {row.getValue("JobSource").name}
+        </div>
       ),
     },
     {
@@ -233,8 +237,13 @@ export default function App() {
       accessorKey: "maxLogins",
       header: "User Logins",
       cell: ({ row }) => (
-        <div className="font-medium">
-          {row.original.activeLogins} / {row.original.maxLogins}{" "}
+        // console.log((row.original.activeLogins / row.original.maxLogins) * 100),
+        <div className="font-medium flex items-center gap-3 min-w-fit">
+
+          <Progress indicatorColor={(row.original.activeLogins / row.original.maxLogins) * 100 > 50 ? "bg-indigo-600" : "bg-blue-400"} value={(row.original.activeLogins / row.original.maxLogins) * 100} className="h-2.5" />
+          <div className="flex min-w-[3rem]">
+            {row.original.activeLogins} / {row.original.maxLogins}
+          </div>
         </div>
       ),
     },
@@ -249,7 +258,7 @@ export default function App() {
               size="sm"
               onClick={() => handleEnable(row.original.id)}
               variant="outline"
-              className="h-8 w-20 font-normal border-none bg-purple-500 hover:bg-purple-600 hover:text-white text-white"
+              className="h-8 w-20 font-normal border-none bg-indigo-500 hover:bg-indigo-600 hover:text-white text-white"
             >
               Enable
             </Button>
@@ -269,7 +278,7 @@ export default function App() {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => <ManageUsers jobs={row.original} />,
+      cell: ({ row }) => <ManageUsers refreshFunction={fetchData} jobs={row.original} />,
     },
     {
       id: "usersDropdown",
@@ -329,7 +338,7 @@ export default function App() {
         </div>
         <div className="rounded-md border">
           <Table>
-            <TableHeader className="bg-gray-200">
+            <TableHeader className="bg-gray-50">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -341,9 +350,9 @@ export default function App() {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}

@@ -37,7 +37,7 @@ export default function AddJob({ sources }) {
     <>
       <Dialog>
         <DialogTrigger>
-          <Button className="bg-blue-500 hover:bg-blue-600 px-8">Add</Button>
+          <Button className="bg-indigo-500 hover:bg-blue-600 px-8">Add</Button>
         </DialogTrigger>
         <DialogContent className="bg-white border-none">
           <DialogTitle>Are you absolutely sure?</DialogTitle>

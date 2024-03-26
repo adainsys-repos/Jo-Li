@@ -45,11 +45,11 @@ export default function Users({
     <>
       <Sheet>
         <SheetTrigger>
-          <Button className="px-8 bg-transparent hover:bg-transparent">
-            <FaUser className="h-4 w-4 text-black" />
+          <Button className="bg-transparent hover:bg-transparent">
+            <FaUser className="size-6 text-black/50 bg-gray-200 p-1 rounded-full" />
           </Button>
         </SheetTrigger>
-        <SheetContent className="border-none !max-w-[30vw]">
+        <SheetContent className="border-none !max-w-[40vw]">
           <SheetHeader>
             <SheetTitle className="text-black/90">Users</SheetTitle>
             <div className="space-y-10 py-4">

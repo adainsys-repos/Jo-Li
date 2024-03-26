@@ -4,11 +4,12 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Lock, Mail } from "lucide-react";
+import { Loader2, Lock, Mail } from "lucide-react";
 import axiosInstance from "../../../config/axiosInstance";
 import Cookies from "js-cookie";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "../ui/use-toast";
 
 const formSchema = z.object({
   email: z.string().min(2).max(50),
@@ -19,6 +20,7 @@ export default function SignIn() {
 
   const { pathname } = useLocation()
 
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +41,7 @@ export default function SignIn() {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true)
     try {
       await axiosInstance
         .post("/auth/sign-in", {
@@ -50,16 +53,28 @@ export default function SignIn() {
           Cookies.set("A_RefreshToken", res.data.tokens.refreshToken, {
             expires: 3,
           });
+          setLoading(false)
+          toast({
+            description: "Sign in successful",
+            title: "Sign in success",
+            variant: "default",
+          })
           navigate("/");
         });
     } catch (e) {
-      console.log(e);
+      console.log(e?.response?.data.message)
+      toast({
+        description: e?.response?.data.message,
+        title: "Sign in failed",
+        variant: "destructive",
+      })
+      setLoading(false)
     }
   }
 
   return (
     <div className="flex flex-col m-auto items-center justify-center max-w-6xl h-screen">
-      <div className="h-fit w-4/12 border border-slate-950 rounded-xl px-2.5 py-4">
+      <div className="h-fit w-4/12 border rounded-xl px-2.5 py-4">
         <h3 className="text-center text-black/80 text-3xl font-bold py-3">
           JoLi
         </h3>
@@ -75,13 +90,14 @@ export default function SignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="bg-black/5 flex gap-1 w-full items-center justify-center rounded-md px-2 ">
+                    <div className="bg-gray-100/50 flex gap-3 w-full items-center justify-center rounded-md px-2 ">
                       <Mail className=" h-4 text-black/50" strokeWidth={1.5} />
 
                       <Input
+                        disabled={loading}
                         autoComplete="off"
                         className=" bg-transparent focus-visible:bg-none relative border-none focus-visible:ring-none px-0 "
-                        placeholder="email address"
+                        placeholder="Email"
                         {...field}
                       />
                     </div>
@@ -95,13 +111,14 @@ export default function SignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="bg-black/5 flex gap-1 w-full items-center justify-center rounded-md px-2 ">
+                    <div className="bg-gray-100/50 flex gap-3 w-full items-center justify-center rounded-md px-2 ">
                       <Lock
                         className=" h-4 text-black/50  "
                         strokeWidth={1.5}
                       />
 
                       <Input
+                        disabled={loading}
                         type="password"
                         className=" bg-transparent relative border-none focus-visible:border-none focus-visible:ring-none px-0 "
                         placeholder="Password"
@@ -113,10 +130,11 @@ export default function SignIn() {
               )}
             />
             <Button
+              disabled={loading}
               type="submit"
               className="w-full bg-blue-600 h-9 shadow-md hover:bg-blue-500"
             >
-              Login
+              {loading ? <Loader2 className="animate-spin" /> : "Login"}
             </Button>
           </form>
         </Form>
