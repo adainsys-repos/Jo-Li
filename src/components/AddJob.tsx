@@ -18,6 +18,7 @@ import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../config/axiosInstance";
 import { useStore } from "../../context/store";
+import { toast } from "./ui/use-toast";
 
 export default function AddJob({ sources }) {
   // const [sources, setSources] = useState([]);
@@ -26,11 +27,21 @@ export default function AddJob({ sources }) {
   const { updateJobs, setUpdateJobs } = useStore();
 
   const Submit = async () => {
-    await axiosInstance.post("/jobs/job-id", {
-      jobSourceId: selectedSource,
-      jobId: jobId,
-    });
-    setUpdateJobs(!updateJobs);
+    try {
+      await axiosInstance.post("/jobs/job-id", {
+        jobSourceId: selectedSource,
+        jobId: jobId,
+      });
+      setUpdateJobs(!updateJobs);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Duplicate Id not allowed",
+        variant: "destructive",
+      })
+
+    }
+
   };
 
   return (
