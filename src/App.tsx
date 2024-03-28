@@ -39,6 +39,9 @@ import { useDebounce } from "use-debounce";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "./components/ui/skeleton";
 import { Progress } from "./components/ui/progress";
+import { Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./components/ui/dialog";
+import { toast } from "./components/ui/use-toast";
 
 export default function App() {
   const [data, setJobs] = useState([]);
@@ -126,6 +129,32 @@ export default function App() {
       console.log(e);
     }
   };
+
+  const handleDelete = async ({ jobId, jobSourceId }: { jobId: string, jobSourceId: string }) => {
+    try {
+      await axiosInstance.delete("/jobs/job-id", {
+        data: {
+          jobSourceId: jobSourceId,
+          jobId: jobId,
+        }
+      });
+
+      toast({
+        title: "Success",
+        description: "Deleted JobId",
+      })
+
+      fetchData()
+
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong",
+        variant: "destructive",
+      })
+
+    }
+  }
 
   useEffect(() => {
     fetchData();
@@ -284,6 +313,32 @@ export default function App() {
       id: "usersDropdown",
       header: "Users",
       cell: ({ row }) => <Users jobs={row.original} />,
+    },
+    {
+      id: "usersDelete",
+      header: "",
+      cell: ({ row }) =>
+        <Dialog>
+          <DialogTrigger>
+            <Button type="button" variant={"ghost"} className="opacity-55 size-14 text-rose-600"><Trash2 /></Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Job</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this JobId?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant={"outline"}
+                className="h-8 w-20 font-normal border-none bg-rose-500 hover:bg-rose-600 hover:text-white text-white"
+                onClick={() => handleDelete({ jobId: row.original.id, jobSourceId: row.original.JobSource.id })}
+              >Yes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ,
     },
   ];
 
